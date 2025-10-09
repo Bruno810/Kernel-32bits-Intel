@@ -1,6 +1,6 @@
 # Trabajo Práctico - System Programming
 
-Modalidad: grupal - 3 integrantes por grupo. Informar los grupos en el form provisto por la cátedra.
+Modalidad: grupal - 3 integrantes por grupo.
 
 Fecha de entrega: 06/11 comisión Furfi | 10/11 comisión David
 
