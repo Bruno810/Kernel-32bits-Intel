@@ -46,13 +46,68 @@ Las preguntas a continuación las pueden responder inline o en otro archivo mark
 
 1. Explorando el manual Intel *Volumen 3: System Programming. Sección 2.2 Modes of Operation*. ¿A qué nos referimos con modo real y con modo protegido en un procesador Intel? ¿Qué particularidades tiene cada modo?
 
+---
+
+**Res:** 
+
+**Modo Real:** Modo en el que arrancan todos los procesadores x86 después de un power-up o un reset. No hay proteccion ni privilegios para acceder a los datos. Se tiene los modos de direccionamiento limitados pero tenemos disponibles todos los sets de intrucciones. Se trabaja en 16 bits y se puede direccionar la memoria hasta 1MB.
+
+**Modo Protegido:** Modo nativo de operación del procesador. Provee sets de características de arquitectura, flexibilidad, mayor rendimiento y retrocompatibilidad. Se caracteriza por la segmentación de la memoria con ciertos privilegios para protección de código y datos. Los sets de isntrucciones disponibles dependen el nivel de privilegio. Se trabaja en 32 bits y se puede direccionar la memoria hasta 4GB.
+
+---
+
 2. Comenten en su equipo, ¿Por qué debemos hacer el pasaje de modo real a modo protegido? ¿No podríamos simplemente tener un sistema operativo en modo real? ¿Qué desventajas tendría?
+
+---
+
+**Res:** 
+
+Trabajar en modo real, si bien nos permite tener acceso a todas las intrucciones sin pensar en privilegios, estaríamos trabajando con solo 1MB de memoria disponible total (comparado con 4GB en el modo protegido) que es vulnerable sin la segmentación de protección y el requerimiento de privilegios. Trabajar en modo protegido también nos da estabilidad al evitar a acceder a segmentos que no deberian modificarse.
+
+---
 
 Anteriormente, detallamos que la memoria es un arreglo continuo de bytes y que podemos segmentarla de acuerdo a tamaño, nivel de protección y uso. Debemos indicar al procesador la descripción de los segmentos, es decir, cómo están conformados los segmentos. Los ejercicios a continuación tienen que ver con el armado de la tabla de segmentos.
 
 3. Busquen el manual *volumen 3 de Intel en la sección 3.4.5 Segment Descriptors*. ¿Qué es la GDT? ¿Cómo es el formato de un descriptor de segmento, bit a bit? Expliquen brevemente para qué sirven los campos *Limit*, *Base*, *G*, *P*, *DPL*, *S*. También pueden referirse a los slides de la clase teórica, aunque recomendamos que se acostumbren a consultar el manual.
+
+---
+
+**Res:** 
+
+**GDT:** La Global Descriptor Table es una tabla de memoria que contiene descriptores de segmentos. Estos descriptores provee al procesador con el tamaño, ubicación y atributos de acceso de los segmentos.
+
+**Formato de un descriptor de segmento:**
+
+![](img/formato-descriptor.png)
+
+**Limit:** El campo de límite de segmento indica el tamaño máximo del segmento y establece los límites de dirección que se pueden acceder dentro de él. Protege la memoria evitando que se lean o escriban direcciones fuera de ese rango.
+
+**Base:** Indican dónde comienza el segmento en la memoria lineal, formando una dirección de 32 bits. Ayuda al procesador a localizar el segmento.
+
+**G:** Define la unidad de medida del límite del segmento. Si está en 0, el límite se mide en bytes. Si está en 1, se mide en bloques de 4 KB, permitiendo segmentos más grandes.
+
+**P:** Señala si el segmento está presente en memoria (1) o no (0), permitiendo al sistema manejar memoria virtual y cargar segmentos según sea necesario.
+
+**DPL:** Define el nivel de privilegio del segmento (0 a 3) y controla quién puede acceder a él.
+
+**S:** Indica si el descriptor es de sistema (0) o de código/datos (1).
+
+---
     
 4. La tabla de la sección 3.4.5.1 *Code- and Data-Segment Descriptor Types* del volumen 3 del manual del Intel nos permite completar el *Type*, los bits 11, 10, 9, 8. ¿Qué combinación de bits tendríamos que usar si queremos especificar un segmento para ejecución y lectura de código?
+
+---
+
+**Res:** 
+
+Segun el manual, la combinación sería la siguiente para Excecute/Read:
+
+**11:** 1   
+**10:** 0   
+**9:** 1   
+**8:** 0   
+
+---
 
 ![](img/resolucion-dir-logica.png)
 
@@ -77,6 +132,15 @@ Recuerden que el límite es el último valor accesible dentro del segmento (es i
 Ahora, trabajemos con el código provisto por la cátedra. Vamos a completar la tabla de segmentos y cargar los descriptores de segmento. Hemos provisto estructuras en C que permiten simplificar la especificación de los campos de cada descriptor.
 
 6. En el archivo `gdt.h` observen las estructuras: `struct gdt_descriptor_t` y el `struct gdt_entry_t`. ¿Qué creen que contiene la variable `extern gdt_entry_t gdt;` y `extern gdt_descriptor_t GDT_DESC;`?
+
+---
+
+**Res:** 
+
+`extern gdt_entry_t gdt;` es la tabla de descriptores de segmentos
+mientras que `extern gdt_descriptor_t GDT_DESC;` es el descriptor de la gdt.
+
+---
 
 7. Buscar en el Volumen 3 del manual de Intel, sección 3.4.2 *Segment Selectors* el formato de los selectores de segmento. Observar en el archivo `defines.h` las constantes con los valores de distintos selectores de segmento posibles. Completen los defines faltantes en `defines.h` y entiendan la utilidad de las macros allí definidas. 
    **USAR LAS MACROS** para definir los campos de los entries de la gdt. En lo posible, no hardcodeen los números directamente en los campos.
