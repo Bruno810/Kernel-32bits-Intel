@@ -12,6 +12,10 @@ global start
 extern A20_enable
 extern GDT_DESC
 extern screen_draw_layout
+extern idt_init
+extern IDT_DESC
+extern pic_reset
+extern pic_enable
 
 ; COMPLETAR - Definan correctamente estas constantes cuando las necesiten
 %define CS_RING_0_SEL   1 << 3
@@ -99,7 +103,7 @@ modo_protegido:
     ; COMPLETAR - Inicializar pantalla (Parte 1: Pasake a modo protegido)
     call screen_draw_layout
 
-    
+
     ; ===================================
     ; ||     (Parte 3: Paginación)     ||
     ; ===================================
@@ -134,23 +138,32 @@ modo_protegido:
     ; COMPLETAR - las funciones en idt.c
 
     ; COMPLETAR - Inicializar y cargar la IDT
+    call idt_init
+    LIDT [IDT_DESC]
 
     ; COMPLETAR - Reiniciar y habilitar el controlador de interrupciones (ver pic.c)
+    call pic_reset
+    call pic_enable
 
     ; COMPLETAR - Rutinas de atención de reloj, teclado, e interrupciones 88 y 89 (en isr.asm)
 
     ; COMPLETAR (Parte 4: Tareas)- Cargar tarea inicial
 
     ; COMPLETAR - Habilitar interrupciones (!! en etapas posteriores, evaluar si se debe comentar este código !!)
-    
+    sti
+
     ; NOTA: Pueden chequear que las interrupciones funcionen forzando a que se
     ;       dispare alguna excepción (lo más sencillo es usar la instrucción
     ;       `int3`)
-    ;int3
+    ;int 3
 
     ; COMPLETAR - Probar Sys_call (para etapas posteriores, comentar este código)
+    ;int 88
+    ;int 98
 
     ; COMPLETAR - Probar generar una excepción (para etapas posteriores, comentar este código)
+    ;int 5
+    ;int 7
     
     ; ========================
     ; ||  (Parte 4: Tareas)  ||

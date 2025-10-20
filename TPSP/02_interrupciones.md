@@ -35,8 +35,8 @@ necesario!**).
 
 En esta parte, vamos a definir y cargar la IDT en memoria. Utilizaremos
 los descriptores de excepciones, interrupciones y system calls. Además,
-vamos a trabajar en las rutinas de atención de interrupción (*ISR:
-Interrupt Service Routine*), en particular, las necesarias para atender
+vamos a trabajar en las rutinas de atención de interrupción (_ISR:
+Interrupt Service Routine_), en particular, las necesarias para atender
 las excepciones. Estas rutinas, en principio, sólo van a imprimir en
 pantalla la excepción generada, junto con el estado de los registros del
 microprocesador.
@@ -44,7 +44,7 @@ microprocesador.
 Completen en grupo los siguientes puntos:
 
 1. En el archivo idt.h, pueden encontrar la IDT definida como un arreglo de `idt_entry_t` declarado sólo una vez como `idt`.
-El descriptor de la IDT en el código se llama `IDT_DESC`.
+   El descriptor de la IDT en el código se llama `IDT_DESC`.
 
 En el archivo idt.c pueden encontrar la definición de cada una de las entradas y la definición de la función `idt_init` que inicializa la IDT definiendo cada una de sus entradas usando la macro `IDT_ENTRYx`.
 
@@ -57,21 +57,51 @@ Observen que los atributos son los bits 15 a 5 de la palabra de 32 bits superior
 
 > Figura 1: Entrada de la IDT - Interrupt Gate
 
-b) :pen_fountain: Completar los campos de Selector de Segmento (`segsel`) y los atributos (`attr`) de manera que al usarse la macro defina una *Interrupt Gate* de nivel 0.
-Para el Selector de Segmento, recuerden que la rutina de atención de interrupción es un código que corre en el nivel del kernel. ¿Cuál sería un selector de segmento apropiado acorde a los índices definidos en la `GDT[segsel]`? ¿Y el valor de los atributos si usamos _Gate Size_ de 32 bits?
+---
+
+**Res:**
+
+**offset:** Tiene la dirección de memoria en donde empieza la interrupción.
+
+**Segment Selector:** Dice que selector de código o data debe usarse para la interrupción.
+
+**P:** Si esta presente para usarse.
+
+**DPL:** Te dice el nivel de privilegio que se necesita para llamar la interrupción.
+
+**bit 8-12:** Indica que tipo de interrupción es (task gate, interrupt gate, trap gate).
+
+---
+
+b) :pen*fountain: Completar los campos de Selector de Segmento (`segsel`) y los atributos (`attr`) de manera que al usarse la macro defina una *Interrupt Gate* de nivel 0.
+Para el Selector de Segmento, recuerden que la rutina de atención de interrupción es un código que corre en el nivel del kernel. ¿Cuál sería un selector de segmento apropiado acorde a los índices definidos en la `GDT[segsel]`? ¿Y el valor de los atributos si usamos \_Gate Size* de 32 bits?
+
+---
+
+**Res:**
+El selector de segmento apropiado sería el `GDT_CODE_0_SEL`.
+El valor del atributo si usamos una Gate Size de 32 bits sería poner en 1 el bit 11, ya que es el que indíca si va a ser de 32 o 16 bits.
+
+---
 
 c) :pen_fountain: De manera similar, completar la macro `IDT_ENTRY3` para que defina interrupciones que puedan ser disparadas por código no privilegiado (nivel 3).
 
 2. Completar la función idt_init() con las entradas correspondientes a las interrupciones de reloj y teclado ¿Qué macro utilizarían?
 
+---
+
+**Res:**
+Para el reloj y teclado usaríamos `IDT_ENTRY0`.
+
+---
+
 3. Nos queda definir dos system calls. Estas son interrupciones de software que se van a poder usar con nivel de privilegio de usuario, en nuestro caso, nivel 3.
-Usar la macro correspondiente para definir system calls con número 88 y 98.
+   Usar la macro correspondiente para definir system calls con número 88 y 98.
 
 4. Completen `kernel.asm` inicializando la IDT y usen `lidt` para cargar la IDT en memoria
 
 Compilen y ejecuten con qemu.
 Pueden examinar la IDT con el comando `info idt` para ver toda la tabla o usar GDB tradicionalmente para ver una entrada: `p idt[x]` dónde `x` es el número de entrada en la IDT.
-
 
 ### Segunda parte: Rutinas de Atención de Interrupción
 
@@ -79,38 +109,45 @@ El manejo de las interrupciones lo estaremos haciendo en esta parte del
 taller.
 
 1. En `pic.c` deberan completar la inicialización del PIC (los PICs), en particular, la función pic_reset() deberá enviarles las palabras de configuración.
-Recordar remapear las interrupciones del **PIC1** a partir de la 32 (0x20) y del **PIC2** a partir de la 40 (0x28).
+   Recordar remapear las interrupciones del **PIC1** a partir de la 32 (0x20) y del **PIC2** a partir de la 40 (0x28).
 
 2. Agregar en `kernel.asm` la inicialización correspondiente para los PICs.
 
 3. Las rutinas de atención de interrupción son definidas en el archivo `isr.asm`.
-Cada una está definida usando la etiqueta `_isr##` donde `##` es el número de la interrupción.
-Busquen en el archivo la rutina de atención de interrupción del reloj.
+   Cada una está definida usando la etiqueta `_isr##` donde `##` es el número de la interrupción.
+   Busquen en el archivo la rutina de atención de interrupción del reloj.
 
 Completar la rutina asociada al reloj, para que por cada interrupción llame a la función `next_clock`. La misma se encarga de mostrar, cada vez que se llame, la animación de un cursor rotando en la esquina inferior derecha de la pantalla.
 La función `next_clock` está definida en `isr.asm`.
 
 :pen_fountain: ¿Qué oficiaría de prólogo y epílogo de estas rutinas? ¿Qué marca el `iret` y por qué no usamos `ret`?
 
+---
+
+**Res:**
+Para el prólogo oficiaría `pushad` y para el epílogo `popad`.
+El `iret` se diferencia de `ret` en que, ademas de restaurar el valor de `eip` (la dirección de retorno), también restaura los registros `eflags` y `cs`.
+
+---
+
 4. Completen la rutina de interrupción de teclado. La misma debe leer el scan code del puerto `0x60` y luego procesarlo con la función `process_scancode` provista en `keyboard_input.c`.
 
 5. Escribir las rutinas asociadas a las interrupciones 88 y 98, para que modifique el valor de eax por 0x58 y 0x62 respectivamente.
-Posteriormente, este comportamiento va a ser modificado para atender cada uno de los servicios del sistema.
+   Posteriormente, este comportamiento va a ser modificado para atender cada uno de los servicios del sistema.
 
 6. Habiliten las interrupciones con `sti` en `kernel.asm`.
-Luego, escriban un par de líneas que utilicen la instrucción `int` para probar alguna de las interrupciones de software que cargaron.
-Pueden poner un breakpoint después de la interrupción para inspeccionar los registros y verificar que se produjo el cambio de valor en `eax`.
+   Luego, escriban un par de líneas que utilicen la instrucción `int` para probar alguna de las interrupciones de software que cargaron.
+   Pueden poner un breakpoint después de la interrupción para inspeccionar los registros y verificar que se produjo el cambio de valor en `eax`.
 
 7. Compilen y ejecuten con qemu. Verifiquen la ejecución de la rutina de atención del reloj y de las interrupciones 88, 98.
-Discutan por qué va rotando el reloj.
+   Discutan por qué va rotando el reloj.
 
-
-### Opcionales:  
+### Opcionales:
 
 1.  \[Optativo\] Vamos a trabajar con el reloj.
-Vimos que es fundamental para la conmutación de tareas.
-El mismo se puede configurar escribiendo el valor de la cuenta (16 bits) en el puerto 0x40.
-La interrupción de reloj se genera, por defecto, cada 65536 pulsos de un clock de 1193182Hz (ciclos por segundo), es decir, llega la interrupción a una tasa de 1193812 Hz / 65536 = 18,206 Hz.
+    Vimos que es fundamental para la conmutación de tareas.
+    El mismo se puede configurar escribiendo el valor de la cuenta (16 bits) en el puerto 0x40.
+    La interrupción de reloj se genera, por defecto, cada 65536 pulsos de un clock de 1193182Hz (ciclos por segundo), es decir, llega la interrupción a una tasa de 1193812 Hz / 65536 = 18,206 Hz.
 
 **Se pide:**
 

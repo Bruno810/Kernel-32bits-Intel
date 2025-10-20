@@ -22,6 +22,18 @@ void pic_finish2(void) {
 
 // COMPLETAR: implementar pic_reset()
 void pic_reset() {
+  outb(PIC1_PORT, 0x11);
+  outb(PIC1_PORT + 1, 0x20);
+  outb(PIC1_PORT + 1, 0x4);
+  outb(PIC1_PORT + 1, 0x1);
+  outb(PIC1_PORT + 1, 0xFF);
+
+
+  outb(PIC2_PORT, 0x11);
+  outb(PIC2_PORT + 1, 0x28);
+  outb(PIC2_PORT + 1, 0x02);
+  outb(PIC2_PORT + 1, 0x01);
+  outb(PIC2_PORT + 1, 0xFF);
 }
 
 void pic_enable() {

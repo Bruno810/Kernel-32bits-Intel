@@ -28,6 +28,9 @@ extern tasks_screen_update
 extern tasks_syscall_draw
 extern tasks_input_process
 
+
+extern process_scancode
+
 ;; Definición de MACROS
 ;; -------------------------------------------------------------------------- ;;
 
@@ -154,9 +157,11 @@ _isr32:
     pushad
     ; 1. Le decimos al PIC que vamos a atender la interrupción
     ; COMPLETAR
+    call pic_finish1
     
     ; 2. Imprimimos el reloj que gira en pantalla
     ; COMPLETAR
+    call next_clock
     
     ; 3. Realizamos el cambio de tareas en caso de ser necesario
     ; COMPLETAR
@@ -176,8 +181,13 @@ global _isr33
 _isr33:
     pushad
     ; 1. Le decimos al PIC que vamos a atender la interrupción
+    call pic_finish1
     
     ; 2. Leemos la tecla desde el teclado y la procesamos con la funcion tasks_input_process
+    in al, 0x60
+    push eax
+    call process_scancode
+    pop eax
     
     popad
     iret
@@ -192,6 +202,7 @@ global _isr88
 ; Para las secciones de paginación y tareas: que llame a la funcion task_syscall_draw
 _isr88:
 
+  mov eax, 0x58
   iret
 
 
@@ -199,6 +210,15 @@ _isr88:
 ; La rutina debe modificar el valor de eax por 0x62
 global _isr98
 _isr98:
+  
+  mov eax, 0x62
+  iret
+
+
+
+global _isr100
+_isr100:
+  
   
   iret
 
