@@ -9,10 +9,13 @@ global start
 
 
 ; COMPLETAR - Agreguen declaraciones extern según vayan necesitando
+extern A20_enable
+extern GDT_DESC
+extern screen_draw_layout
 
 ; COMPLETAR - Definan correctamente estas constantes cuando las necesiten
-;%define CS_RING_0_SEL ??   
-;%define DS_RING_0_SEL ??   
+%define CS_RING_0_SEL   1 << 3
+%define DS_RING_0_SEL   3 << 3   
 
 
 BITS 16
@@ -28,6 +31,8 @@ start_rm_len equ    $ - start_rm_msg
 start_pm_msg db     'Iniciando kernel en Modo Protegido'
 start_pm_len equ    $ - start_pm_msg
 
+PE_BIT equ 1
+
 ;;
 ;; Seccion de código.
 ;; -------------------------------------------------------------------------- ;;
@@ -40,6 +45,7 @@ start:
     ; ==============================
 
     ; COMPLETAR - Deshabilitar interrupciones (Parte 1: Pasake a modo protegido)
+    cli
 
     ; Cambiar modo de video a 80 X 50
     mov ax, 0003h
@@ -51,30 +57,48 @@ start:
     ; COMPLETAR - Imprimir mensaje de bienvenida - MODO REAL (Parte 1: Pasake a modo protegido)
     ; (revisar las funciones definidas en print.mac y los mensajes se encuentran en la
     ; sección de datos)
+    print_text_rm start_rm_msg, start_rm_len, 0x2, 0, 0
 
     ; COMPLETAR - Habilitar A20 (Parte 1: Pasake a modo protegido)
     ; (revisar las funciones definidas en a20.asm)
+    call A20_enable
 
     ; COMPLETAR - los defines para la GDT en defines.h y las entradas de la GDT en gdt.c
     ; COMPLETAR - Cargar la GDT (Parte 1: Pasake a modo protegido)
+    LGDT [GDT_DESC]
 
     ; COMPLETAR - Setear el bit PE del registro CR0 (Parte 1: Pasake a modo protegido)
+    mov eax, CR0
+    or eax, 1
+    mov CR0, eax
 
     ; COMPLETAR - Saltar a modo protegido (far jump) (Parte 1: Pasake a modo protegido)
     ; (recuerden que un far jmp se especifica como jmp CS_selector:address)
     ; Pueden usar la constante CS_RING_0_SEL definida en este archivo
+    jmp CS_RING_0_SEL:modo_protegido
 
 BITS 32
 modo_protegido:
     ; COMPLETAR (Parte 1: Pasake a modo protegido) - A partir de aca, todo el codigo se va a ejectutar en modo protegido
     ; Establecer selectores de segmentos DS, ES, GS, FS y SS en el segmento de datos de nivel 0
     ; Pueden usar la constante DS_RING_0_SEL definida en este archivo
+    mov ax, DS_RING_0_SEL
+    mov ds, ax
+    mov es, ax
+    mov gs, ax
+    mov fs, ax
+    mov ss, ax
 
     ; COMPLETAR - Establecer el tope y la base de la pila (Parte 1: Pasake a modo protegido)
+    mov ebp, 0x25000
+    mov esp, 0x25000 
 
     ; COMPLETAR - Imprimir mensaje de bienvenida - MODO PROTEGIDO (Parte 1: Pasake a modo protegido)
+    print_text_pm start_pm_msg, start_pm_len, 0x2, 0, 0
 
     ; COMPLETAR - Inicializar pantalla (Parte 1: Pasake a modo protegido)
+    call screen_draw_layout
+
     
     ; ===================================
     ; ||     (Parte 3: Paginación)     ||
