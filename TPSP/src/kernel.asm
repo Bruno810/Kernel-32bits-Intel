@@ -16,6 +16,8 @@ extern idt_init
 extern IDT_DESC
 extern pic_reset
 extern pic_enable
+extern mmu_init_kernel_dir
+extern mmu_init_task_dir
 
 ; COMPLETAR - Definan correctamente estas constantes cuando las necesiten
 %define CS_RING_0_SEL   1 << 3
@@ -113,10 +115,13 @@ modo_protegido:
     ; COMPLETAR - reemplazar la implementacion de la interrupcion 88 (ver comentarios en isr.asm)
     ; COMPLETAR - La rutina de atención del page fault en isr.asm
     ; COMPLETAR - Inicializar el directorio de paginas
-
+    call mmu_init_kernel_dir
     ; COMPLETAR - Cargar directorio de paginas 
-
+    mov cr3, eax
     ; COMPLETAR - Habilitar paginacion 
+    mov eax, cr0
+    or eax, 1<<31
+    mov cr0, eax
 
     ; ========================
     ; ||  (Parte 4: Tareas) ||
@@ -176,6 +181,24 @@ modo_protegido:
     ; COMPLETAR - Restaurar directorio de paginas del kernel
 
     ; COMPLETAR - Saltar a la primera tarea: Idle
+
+
+    ;push 0x18000
+    ;call mmu_init_task_dir
+
+
+    ; Cargar directorio de paginas de la tarea
+    ;mov ecx, cr3
+    ;push ecx
+    ;mov cr3, eax
+
+
+    ;mov dword [0x070000FF], 0xFFF    ;Primer intento de escritura causa page fault
+    ;mov dword [0x070000FF], 0xAAA    ;Segundo intento de escritura no deberia causar page fautl
+
+    ; Restaurar directorio de paginas del kernel
+    ;pop ecx
+    ;mov cr3, ecx
 
     ; Ciclar infinitamente 
     mov eax, 0xFFFF
