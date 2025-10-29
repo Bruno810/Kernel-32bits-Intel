@@ -153,6 +153,22 @@ modo_protegido:
     ; COMPLETAR - Rutinas de atención de reloj, teclado, e interrupciones 88 y 89 (en isr.asm)
 
     ; COMPLETAR (Parte 4: Tareas)- Cargar tarea inicial
+    ;push 0x18000
+    ;call mmu_init_task_dir
+
+
+    ; Cargar directorio de paginas de la tarea
+    ;mov ecx, cr3
+    ;push ecx
+    ;mov cr3, eax
+
+
+    ;mov dword [0x070000FF], 0xFFF    ;Primer intento de escritura causa page fault
+    ;mov dword [0x070000FF], 0xAAA    ;Segundo intento de escritura no deberia causar page fautl
+
+    ; Restaurar directorio de paginas del kernel
+    ;pop ecx
+    ;mov cr3, ecx
 
     ; COMPLETAR - Habilitar interrupciones (!! en etapas posteriores, evaluar si se debe comentar este código !!)
     sti
@@ -181,24 +197,6 @@ modo_protegido:
     ; COMPLETAR - Restaurar directorio de paginas del kernel
 
     ; COMPLETAR - Saltar a la primera tarea: Idle
-
-
-    ;push 0x18000
-    ;call mmu_init_task_dir
-
-
-    ; Cargar directorio de paginas de la tarea
-    ;mov ecx, cr3
-    ;push ecx
-    ;mov cr3, eax
-
-
-    ;mov dword [0x070000FF], 0xFFF    ;Primer intento de escritura causa page fault
-    ;mov dword [0x070000FF], 0xAAA    ;Segundo intento de escritura no deberia causar page fautl
-
-    ; Restaurar directorio de paginas del kernel
-    ;pop ecx
-    ;mov cr3, ecx
 
     ; Ciclar infinitamente 
     mov eax, 0xFFFF
