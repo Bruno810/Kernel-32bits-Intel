@@ -146,8 +146,27 @@ ISRNE 20
 global _isr14
 
 _isr14:
-	  add esp, 4 ; error code
-	  iret
+	; Estamos en un page fault.
+	pushad
+    ; COMPLETAR: llamar rutina de atención de page fault, pasandole la dirección que se intentó acceder
+  .ring0_exception:
+
+  mov edi, cr2
+  push edi 
+  call page_fault_handler
+  pop edi
+
+  cmp al, 1
+  je .fin
+
+	; Si llegamos hasta aca es que cometimos un page fault fuera del area compartida.
+  call kernel_exception
+  jmp $
+
+    .fin:
+	popad
+	add esp, 4 ; error code
+	iret
 
 ;; Rutina de atención del RELOJ
 ;; -------------------------------------------------------------------------- ;;
@@ -165,6 +184,14 @@ _isr32:
     
     ; 3. Realizamos el cambio de tareas en caso de ser necesario
     ; COMPLETAR
+    call sched_next_task
+
+    str cx
+    cmp ax, cx
+    je .fin
+
+    mov word [sched_task_selector], ax
+    jmp far [sched_task_offset]
 
     .fin:
     ; 3. Actualizamos las estructuras compartidas ante el tick del reloj
@@ -186,7 +213,7 @@ _isr33:
     ; 2. Leemos la tecla desde el teclado y la procesamos con la funcion tasks_input_process
     in al, 0x60
     push eax
-    call process_scancode
+    call tasks_input_process
     pop eax
     
     popad
@@ -202,8 +229,14 @@ global _isr88
 ; Para las secciones de paginación y tareas: que llame a la funcion task_syscall_draw
 _isr88:
 
-  call tasks_syscall_draw
-  iret
+    pushad
+    push eax
+
+    call tasks_syscall_draw
+
+    add esp, 4
+    popad
+    iret
 
 
 ; COMPLETAR: Implementar la rutina

@@ -18,6 +18,10 @@ extern pic_reset
 extern pic_enable
 extern mmu_init_kernel_dir
 extern mmu_init_task_dir
+extern tss_init
+extern sched_init
+extern tasks_init
+extern tasks_screen_draw
 
 ; COMPLETAR - Definan correctamente estas constantes cuando las necesiten
 %define CS_RING_0_SEL   1 << 3
@@ -38,6 +42,9 @@ start_pm_msg db     'Iniciando kernel en Modo Protegido'
 start_pm_len equ    $ - start_pm_msg
 
 PE_BIT equ 1
+
+%define GDT_TASK_INITIAL        11 << 3
+%define GDT_TASK_IDLE           12 << 3
 
 ;;
 ;; Seccion de código.
@@ -130,10 +137,13 @@ modo_protegido:
     ; COMPLETAR - reemplazar la implementacion de la interrupcion 88 (ver comentarios en isr.asm)
     ; COMPLETAR - las funciones en tss.c
     ; COMPLETAR - Inicializar tss
+    call tss_init
 
     ; COMPLETAR - Inicializar el scheduler
+    call sched_init
 
     ; COMPLETAR - Inicializar las tareas
+    call tasks_init
 
 
     ; ===================================
@@ -153,22 +163,10 @@ modo_protegido:
     ; COMPLETAR - Rutinas de atención de reloj, teclado, e interrupciones 88 y 89 (en isr.asm)
 
     ; COMPLETAR (Parte 4: Tareas)- Cargar tarea inicial
-    ;push 0x18000
-    ;call mmu_init_task_dir
-
-
-    ; Cargar directorio de paginas de la tarea
-    ;mov ecx, cr3
-    ;push ecx
-    ;mov cr3, eax
-
-
-    ;mov dword [0x070000FF], 0xFFF    ;Primer intento de escritura causa page fault
-    ;mov dword [0x070000FF], 0xAAA    ;Segundo intento de escritura no deberia causar page fautl
-
-    ; Restaurar directorio de paginas del kernel
-    ;pop ecx
-    ;mov cr3, ecx
+    call tasks_screen_draw
+    mov ax, GDT_TASK_INITIAL
+    LTR ax
+    
 
     ; COMPLETAR - Habilitar interrupciones (!! en etapas posteriores, evaluar si se debe comentar este código !!)
     sti
@@ -186,6 +184,23 @@ modo_protegido:
     ;int 5
     ;int 7
     
+    ; push 0x18000
+    ; call mmu_init_task_dir
+
+
+    ; ;Cargar directorio de paginas de la tarea
+    ; mov ecx, cr3
+    ; push ecx
+    ; mov cr3, eax
+
+
+    ; mov dword [0x070000FF], 0xFFF    ;Primer intento de escritura causa page fault
+    ; mov dword [0x070000FF], 0xAAA    ;Segundo intento de escritura no deberia causar page fautl
+
+    ; ;Restaurar directorio de paginas del kernel
+    ; pop ecx
+    ; mov cr3, ecx
+
     ; ========================
     ; ||  (Parte 4: Tareas)  ||
     ; ========================
