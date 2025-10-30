@@ -215,13 +215,6 @@ _isr98:
   iret
 
 
-
-global _isr100
-_isr100:
-  
-  
-  iret
-
 ; PushAD Order
 %define offset_EAX 28
 %define offset_ECX 24

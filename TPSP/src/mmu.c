@@ -88,7 +88,7 @@ paddr_t mmu_init_kernel_dir(void) {
   uint32_t attrs = MMU_P | MMU_W;
 
   kpd[0].attrs = attrs;
-  kpd[0].pt    = MMU_ENTRY_PADDR(KERNEL_PAGE_TABLE_0);
+  kpd[0].pt    = KERNEL_PAGE_TABLE_0 >> 12;
 
 
   //Identity mapping para los primeros 4 MB de memoria
@@ -119,7 +119,7 @@ void mmu_map_page(uint32_t cr3, vaddr_t virt, paddr_t phy, uint32_t attrs) {
   {
     paddr_t pt = mmu_next_free_kernel_page();
     zero_page(pt);
-    pd[pd_indice].pt = MMU_ENTRY_PADDR(pt);
+    pd[pd_indice].pt = pt >> 12;
   }
 
   pd[pd_indice].attrs |= attrs | MMU_P; //Aplicamos atributos (y aseguramos que P quede en 1)
@@ -129,7 +129,7 @@ void mmu_map_page(uint32_t cr3, vaddr_t virt, paddr_t phy, uint32_t attrs) {
   pt_entry_t *pt = (pt_entry_t*) MMU_ENTRY_PADDR(pd[pd_indice].pt); //Puntero a la base de la pt
   uint32_t pt_indice = VIRT_PAGE_TABLE(virt);   //Offset para la entrada de la pt
 
-  uint32_t base_pagina = MMU_ENTRY_PADDR(phy);
+  uint32_t base_pagina = phy >> 12;
   pt[pt_indice].page = base_pagina;
   pt[pt_indice].attrs = attrs | MMU_P;
 
