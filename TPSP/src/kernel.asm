@@ -212,6 +212,7 @@ modo_protegido:
     ; COMPLETAR - Restaurar directorio de paginas del kernel
 
     ; COMPLETAR - Saltar a la primera tarea: Idle
+    jmp GDT_TASK_IDLE:0
 
     ; Ciclar infinitamente 
     mov eax, 0xFFFF

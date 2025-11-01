@@ -223,9 +223,10 @@ paddr_t mmu_init_task_dir(paddr_t phy_start) {
     mmu_map_page(nuevo_cr3, TASK_CODE_VIRTUAL + (i * PAGE_SIZE), phy_start + (i * PAGE_SIZE), MMU_P | MMU_U);
   }
 
+
   //Mapeo de stack
   paddr_t fisica_stack = mmu_next_free_user_page();
-  mmu_map_page(nuevo_cr3, TASK_STACK_BASE, fisica_stack, MMU_P | MMU_U | MMU_W);
+  mmu_map_page(nuevo_cr3, TASK_STACK_BASE - PAGE_SIZE, fisica_stack, MMU_P | MMU_U | MMU_W);
 
 
   //Mapeo de memoria compartida
