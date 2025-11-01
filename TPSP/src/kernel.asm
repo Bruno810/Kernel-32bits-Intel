@@ -42,6 +42,7 @@ start_pm_msg db     'Iniciando kernel en Modo Protegido'
 start_pm_len equ    $ - start_pm_msg
 
 PE_BIT equ 1
+DIVISOR EQU 5000
 
 %define GDT_TASK_INITIAL        11 << 3
 %define GDT_TASK_IDLE           12 << 3
@@ -200,6 +201,17 @@ modo_protegido:
     ; ;Restaurar directorio de paginas del kernel
     ; pop ecx
     ; mov cr3, ecx
+
+    ; El PIT (Programmable Interrupt Timer) corre a 1193182Hz.
+
+    ; Cada iteracion del clock decrementa un contador interno, cuando éste llega
+    ; a cero se emite la interrupción. El valor inicial es 0x0 que indica 65536,
+    ; es decir 18.206 Hz
+
+    mov ax, DIVISOR
+    out 0x40, al
+    rol ax, 8
+    out 0x40, al
 
     ; ========================
     ; ||  (Parte 4: Tareas)  ||
