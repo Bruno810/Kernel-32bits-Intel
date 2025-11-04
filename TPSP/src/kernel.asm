@@ -185,23 +185,6 @@ modo_protegido:
     ;int 5
     ;int 7
     
-    ; push 0x18000
-    ; call mmu_init_task_dir
-
-
-    ; ;Cargar directorio de paginas de la tarea
-    ; mov ecx, cr3
-    ; push ecx
-    ; mov cr3, eax
-
-
-    ; mov dword [0x070000FF], 0xFFF    ;Primer intento de escritura causa page fault
-    ; mov dword [0x070000FF], 0xAAA    ;Segundo intento de escritura no deberia causar page fautl
-
-    ; ;Restaurar directorio de paginas del kernel
-    ; pop ecx
-    ; mov cr3, ecx
-
     ; El PIT (Programmable Interrupt Timer) corre a 1193182Hz.
 
     ; Cada iteracion del clock decrementa un contador interno, cuando éste llega
@@ -218,10 +201,22 @@ modo_protegido:
     ; ========================
     
     ; COMPLETAR - Inicializar el directorio de paginas de la tarea de prueba
+    ; push 0x18000
+    ; call mmu_init_task_dir
 
     ; COMPLETAR - Cargar directorio de paginas de la tarea
+    ; mov ecx, cr3
+    ; push ecx
+    ; mov cr3, eax
+
+    ; mov dword [0x070000FF], 0xFFF    ;Primer intento de escritura causa page fault
+    ; mov dword [0x070000FF], 0xAAA    ;Segundo intento de escritura no deberia causar page fautl
+
 
     ; COMPLETAR - Restaurar directorio de paginas del kernel
+    ; pop ecx
+    ; mov cr3, ecx
+
 
     ; COMPLETAR - Saltar a la primera tarea: Idle
     jmp GDT_TASK_IDLE:0
