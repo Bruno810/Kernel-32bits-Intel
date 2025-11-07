@@ -20,7 +20,7 @@ void pic_finish2(void) {
   outb(PIC2_PORT, 0x20);
 }
 
-// COMPLETAR: implementar pic_reset()
+// implementar pic_reset()
 void pic_reset() {
   outb(PIC1_PORT, 0x11);
   outb(PIC1_PORT + 1, 0x20);

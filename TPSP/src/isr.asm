@@ -148,7 +148,7 @@ global _isr14
 _isr14:
 	; Estamos en un page fault.
 	pushad
-    ; COMPLETAR: llamar rutina de atención de page fault, pasandole la dirección que se intentó acceder
+    ; llamar rutina de atención de page fault, pasandole la dirección que se intentó acceder
   .ring0_exception:
 
   mov edi, cr2
@@ -175,15 +175,12 @@ global _isr32
 _isr32:
     pushad
     ; 1. Le decimos al PIC que vamos a atender la interrupción
-    ; COMPLETAR
     call pic_finish1
     
     ; 2. Imprimimos el reloj que gira en pantalla
-    ; COMPLETAR
     call next_clock
     
     ; 3. Realizamos el cambio de tareas en caso de ser necesario
-    ; COMPLETAR
     call sched_next_task
 
     str cx

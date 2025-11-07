@@ -41,8 +41,7 @@ start_rm_len equ    $ - start_rm_msg
 start_pm_msg db     'Iniciando kernel en Modo Protegido'
 start_pm_len equ    $ - start_pm_msg
 
-PE_BIT equ 1
-DIVISOR EQU 5000
+DIVISOR EQU 3000
 
 %define GDT_TASK_INITIAL        11 << 3
 %define GDT_TASK_IDLE           12 << 3
@@ -58,7 +57,7 @@ start:
     ; ||  Salto a modo protegido  ||
     ; ==============================
 
-    ; COMPLETAR - Deshabilitar interrupciones (Parte 1: Pasake a modo protegido)
+    ; COMPLETAR - Deshabilitar interrupciones (Parte 1: Pasaje a modo protegido)
     cli
 
     ; Cambiar modo de video a 80 X 50
@@ -68,32 +67,32 @@ start:
     mov ax, 1112h
     int 10h ; load 8x8 font
 
-    ; COMPLETAR - Imprimir mensaje de bienvenida - MODO REAL (Parte 1: Pasake a modo protegido)
+    ; COMPLETAR - Imprimir mensaje de bienvenida - MODO REAL (Parte 1: Pasaje a modo protegido)
     ; (revisar las funciones definidas en print.mac y los mensajes se encuentran en la
     ; sección de datos)
     print_text_rm start_rm_msg, start_rm_len, 0x2, 0, 0
 
-    ; COMPLETAR - Habilitar A20 (Parte 1: Pasake a modo protegido)
+    ; COMPLETAR - Habilitar A20 (Parte 1: Pasaje a modo protegido)
     ; (revisar las funciones definidas en a20.asm)
     call A20_enable
 
     ; COMPLETAR - los defines para la GDT en defines.h y las entradas de la GDT en gdt.c
-    ; COMPLETAR - Cargar la GDT (Parte 1: Pasake a modo protegido)
+    ; COMPLETAR - Cargar la GDT (Parte 1: Pasaje a modo protegido)
     LGDT [GDT_DESC]
 
-    ; COMPLETAR - Setear el bit PE del registro CR0 (Parte 1: Pasake a modo protegido)
+    ; COMPLETAR - Setear el bit PE del registro CR0 (Parte 1: Pasaje a modo protegido)
     mov eax, CR0
     or eax, 1
     mov CR0, eax
 
-    ; COMPLETAR - Saltar a modo protegido (far jump) (Parte 1: Pasake a modo protegido)
+    ; COMPLETAR - Saltar a modo protegido (far jump) (Parte 1: Pasaje a modo protegido)
     ; (recuerden que un far jmp se especifica como jmp CS_selector:address)
     ; Pueden usar la constante CS_RING_0_SEL definida en este archivo
     jmp CS_RING_0_SEL:modo_protegido
 
 BITS 32
 modo_protegido:
-    ; COMPLETAR (Parte 1: Pasake a modo protegido) - A partir de aca, todo el codigo se va a ejectutar en modo protegido
+    ; COMPLETAR (Parte 1: Pasaje a modo protegido) - A partir de aca, todo el codigo se va a ejectutar en modo protegido
     ; Establecer selectores de segmentos DS, ES, GS, FS y SS en el segmento de datos de nivel 0
     ; Pueden usar la constante DS_RING_0_SEL definida en este archivo
     mov ax, DS_RING_0_SEL
@@ -103,14 +102,14 @@ modo_protegido:
     mov fs, ax
     mov ss, ax
 
-    ; COMPLETAR - Establecer el tope y la base de la pila (Parte 1: Pasake a modo protegido)
+    ; COMPLETAR - Establecer el tope y la base de la pila (Parte 1: Pasaje a modo protegido)
     mov ebp, 0x25000
     mov esp, 0x25000 
 
-    ; COMPLETAR - Imprimir mensaje de bienvenida - MODO PROTEGIDO (Parte 1: Pasake a modo protegido)
+    ; COMPLETAR - Imprimir mensaje de bienvenida - MODO PROTEGIDO (Parte 1: Pasaje a modo protegido)
     print_text_pm start_pm_msg, start_pm_len, 0x2, 0, 0
 
-    ; COMPLETAR - Inicializar pantalla (Parte 1: Pasake a modo protegido)
+    ; COMPLETAR - Inicializar pantalla (Parte 1: Pasaje a modo protegido)
     call screen_draw_layout
 
 

@@ -245,7 +245,7 @@ bool page_fault_handler(vaddr_t virt) {
   if (virt >= ON_DEMAND_MEM_START_PHYSICAL && virt <= ON_DEMAND_MEM_END_VIRTUAL)
   {
     uint32_t cr3 = rcr3();
-    mmu_map_page(cr3, virt & 0xFFFFF000, ON_DEMAND_MEM_START_PHYSICAL, MMU_P | MMU_U | MMU_W);
+    mmu_map_page(cr3, virt, ON_DEMAND_MEM_START_PHYSICAL, MMU_P | MMU_U | MMU_W);
     print("Page Fault Atendido...", 0, 0, C_FG_GREEN | C_BG_BLACK);
     return true;
   }
