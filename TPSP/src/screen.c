@@ -70,4 +70,7 @@ void screen_draw_box(uint32_t fInit, uint32_t cInit, uint32_t fSize,
 }
 
 void screen_draw_layout(void) {
+  screen_draw_box(0,0,VIDEO_FILS,VIDEO_COLS,32,0);
+
+  print("Lorem ipsum", 32, 25, 0xC);
 }

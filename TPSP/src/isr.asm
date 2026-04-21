@@ -28,6 +28,9 @@ extern tasks_screen_update
 extern tasks_syscall_draw
 extern tasks_input_process
 
+
+extern process_scancode
+
 ;; Definición de MACROS
 ;; -------------------------------------------------------------------------- ;;
 
@@ -130,7 +133,7 @@ ISRE 10
 ISRE 11
 ISRE 12
 ISRE 13
-ISRE 14 ; comentar esta línea en la parte 3 (paginación)
+;ISRE 14 ; comentar esta línea en la parte 3 (paginación)
 ISRNE 15
 ISRNE 16
 ISRE 17
@@ -140,11 +143,30 @@ ISRNE 20
 
 ;; Rutina de atención de Page Fault ISRE 14 ; Descomentar esta rutina en la parte 3 (paginación)
 ;; -------------------------------------------------------------------------- ;;
-;global _isr14
+global _isr14
 
-;_isr14:
-;	add esp, 4 ; error code
-;	iret
+_isr14:
+	; Estamos en un page fault.
+	pushad
+    ; llamar rutina de atención de page fault, pasandole la dirección que se intentó acceder
+  .ring0_exception:
+
+  mov edi, cr2
+  push edi 
+  call page_fault_handler
+  pop edi
+
+  cmp al, 1
+  je .fin
+
+	; Si llegamos hasta aca es que cometimos un page fault fuera del area compartida.
+  call kernel_exception
+  jmp $
+
+    .fin:
+	popad
+	add esp, 4 ; error code
+	iret
 
 ;; Rutina de atención del RELOJ
 ;; -------------------------------------------------------------------------- ;;
@@ -153,13 +175,20 @@ global _isr32
 _isr32:
     pushad
     ; 1. Le decimos al PIC que vamos a atender la interrupción
-    ; COMPLETAR
+    call pic_finish1
     
     ; 2. Imprimimos el reloj que gira en pantalla
-    ; COMPLETAR
+    call next_clock
     
     ; 3. Realizamos el cambio de tareas en caso de ser necesario
-    ; COMPLETAR
+    call sched_next_task
+
+    str cx
+    cmp ax, cx
+    je .fin
+
+    mov word [sched_task_selector], ax
+    jmp far [sched_task_offset]
 
     .fin:
     ; 3. Actualizamos las estructuras compartidas ante el tick del reloj
@@ -176,8 +205,13 @@ global _isr33
 _isr33:
     pushad
     ; 1. Le decimos al PIC que vamos a atender la interrupción
+    call pic_finish1
     
     ; 2. Leemos la tecla desde el teclado y la procesamos con la funcion tasks_input_process
+    in al, 0x60
+    push eax
+    call tasks_input_process
+    pop eax
     
     popad
     iret
@@ -192,7 +226,14 @@ global _isr88
 ; Para las secciones de paginación y tareas: que llame a la funcion task_syscall_draw
 _isr88:
 
-  iret
+    pushad
+    push eax
+
+    call tasks_syscall_draw
+
+    add esp, 4
+    popad
+    iret
 
 
 ; COMPLETAR: Implementar la rutina
@@ -200,7 +241,9 @@ _isr88:
 global _isr98
 _isr98:
   
+  mov eax, 0x62
   iret
+
 
 ; PushAD Order
 %define offset_EAX 28

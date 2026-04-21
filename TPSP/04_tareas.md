@@ -120,10 +120,28 @@ nuevas estructuras, cantidad de nuevas entradas en las estructuras ya
 definidas, y registros tenemos que configurar?¿Qué formato tienen?
 ¿Dónde se encuentran almacenadas?
 
+---
+
+**Res:**
+
+Habría que crear/configurar un `scheduler` que vaya alternando entre las 2 tareas. Agregar 2 `tss` para guardar el contexto de cada tarea. Luego, configuar el sistema de paginación para cada tarea con sus respectivos `page directory` y `page table`. También 2 entradas nuevas en la `gdt` que apunten a la `tss` de cada tarea. Finalmente, utilizar el registro `TR` para almacenar el selector de tss que se este usando actualmente. 
+
+---
+
 **2.** ¿A qué llamamos cambio de contexto? ¿Cuándo se produce? ¿Qué efecto
 tiene sobre los registros del procesador? Expliquen en sus palabras que
 almacena el registro **TR** y cómo obtiene la información necesaria para
 ejecutar una tarea después de un cambio de contexto.
+
+---
+
+**Res:**
+
+Llamamos cambio de contexto cuando se deja de ejecutar una tarea para pasar a otra, guardando su contexto en la `tss` y cargando el contexto de la tarea a ejecutar. Esto se produce cada vez que hay una interrupción de reloj, donde le pide al scheduler la siguiente tarea a ejecutar. 
+El efecto que tiene sobre los registros del procesador es que estos son los que contienen el contexto de la tarea, entonces cuando se cambia de contexto los valores de los registros se guardan en la `tss`.
+Lo que almacena el registro `TR` es el selector de segmento de la tarea que estamos ejecutando, se utiliza para ir a la `gdt` y obtener el descriptor de la `tss`. 
+
+---
 
 **3.** Al momento de realizar un cambio de contexto el procesador va
 almacenar el estado actual de acuerdo al selector indicado en el
@@ -132,11 +150,36 @@ selector se asigna en el *jmp* far. ¿Qué consideraciones deberíamos
 tener para poder realizar el primer cambio de contexto? ¿Y cuáles cuando
 no tenemos tareas que ejecutar o se encuentran todas suspendidas?
 
+---
+
+**Res:**
+
+Las consideraciones que hay que tener para un cambio de contexto es pasar de la `tarea inicial` a la `tarea idle`, teniendo ya configurado la `tss` y el descriptor de la `tss` de la tarea idle.
+Cuando no hay tareas el `scheduler` pasa a la `tarea idle` hasta que se reanude o se inicie la ejecución de otra tarea.
+
+---
+
 **4.** ¿Qué hace el scheduler de un Sistema Operativo? ¿A qué nos
 referimos con que usa una política?
 
+---
+
+**Res:**
+
+El `scheduler` es el que se encarga de decidir que tarea se va a ejecutar en cada tick de reloj, mediante una política que decide que tarea elegir. Cuando se usa política nos referimos a que se utiliza un conjunto de criterios que le indica al `scheduler` cual tarea va a ser la próxima en ejecutarse.
+
+---
+
 **5.** En un sistema de una única CPU, ¿cómo se hace para que los
 programas parezcan ejecutarse en simultáneo?
+
+---
+
+**Res:**
+
+Los programas parecen ejecutarse en simultáneo ya que los cambios de tarea se hacen a una velocidad imperceptible para el ojo humano.
+
+---
 
 **6.** En **tss.c** se encuentran definidas las TSSs de la Tarea
 **Inicial** e **Idle**. Ahora, vamos a agregar el *TSS Descriptor*
@@ -181,6 +224,14 @@ También, verifiquen los valores de los registros **CR3** con **creg** y de los 
 ***sreg***. ¿Por qué hace falta tener definida la pila de nivel 0 en la
 tss?
 
+---
+
+**Res:**
+
+Hace falta definir la pila de nivel 0 en la `tss` ya que de otra manera no se podría volver a encontrar la pila de kernel de una tarea. Siendo esto importante para poder restaurar el contexto de la tarea con la instrucción `popad` al final de la interrupción de reloj.
+
+---
+
 **10.** En **tss.c**, completar la función ***tss_create_user_task***
 para que inicialice una TSS con los datos correspondientes a una tarea
 cualquiera. La función recibe por parámetro la dirección del código de
@@ -209,16 +260,16 @@ global _isr32
   
 _isr32:
   pushad
-  call pic_finish1
+  call pic_finish1 ;avisa al pic que estamos atendiendo la interrupción
   
-  call sched_next_task
+  call sched_next_task ;pedimos al scheduler la siguiente tarea a ejecutar
   
-  str cx
-  cmp ax, cx
-  je .fin
+  str cx ;carga en cx el tr de la tarea actual
+  cmp ax, cx ;compara el tr con el que nos devolvió el scheduler
+  je .fin ;si son iguales no ocurre nada más
   
-  mov word [sched_task_selector], ax
-  jmp far [sched_task_offset]
+  mov word [sched_task_selector], ax ;se setea la próxima tarea a ejecutar
+  jmp far [sched_task_offset] ;se hace el salto a la tarea a ejecutar (cambio de contexto)
   
   .fin:
   popad
@@ -232,8 +283,25 @@ b)  En la línea que dice ***jmp far \[sched_task_offset\]*** ¿De que
     indica cada uno de estos valores? ¿Tiene algún efecto el offset
     elegido?
 
+---
+
+**Res:**
+
+El tamaño del dato que se lee desde la memoria es de 16bits, que indíca que selector de la `gdt` obtener para conseguir la `tss` de la tarea a ejecutarse.
+El offset no tiene ningún efecto.
+
+---
+
 c)  ¿A dónde regresa la ejecución (***eip***) de una tarea cuando
     vuelve a ser puesta en ejecución?
+
+---
+
+**Res:**
+
+Regresa a apuntar a la intrucción `popad` de la interrupción del reloj.
+
+---
 
 d)  Reemplazar su implementación anterior de la rutina de atención de reloj por la provista.
 
@@ -244,6 +312,14 @@ a)  En los archivos **sched.c** y **sched.h** se encuentran definidos
     los métodos necesarios para el Scheduler. Expliquen cómo funciona
     el mismo, es decir, cómo decide cuál es la próxima tarea a
     ejecutar. Pueden encontrarlo en la función ***sched_next_task***.
+
+---
+
+**Res:**
+
+Se fija la siguiente tarea después de la actual que se pueda ejecutar (TASK_RUNNABLE) y devuelve su selector, si no encuentra ninguna devuelve el selector de la tarea idle.
+
+---
 
 b)  Modifiquen **kernel.asm** para llamar a la función
     ***sched_init*** luego de iniciar la TSS
@@ -266,16 +342,46 @@ gdt[gdt_id] = tss_gdt_entry_for_task(&tss_tasks[task_id]);
 ```
 a)  ¿Qué está haciendo la función ***tss_gdt_entry_for_task***?
 
+---
+
+**Res:**
+Te devuelve el descriptor de la `gdt` para la `tss` de la tarea.
+
+---
+
 b)  ¿Por qué motivo se realiza el desplazamiento a izquierda de
     **gdt_id** al pasarlo como parámetro de ***sched_add_task***?
+
+---
+
+**Res:**
+
+El `sched_add_task` toma un selector de segmento, al shiftear el index se obtiene un selector válido con `TI` y `RPL` en 0.
+
+---
 
 **15.** Ejecuten las tareas en *qemu* y observen el código de estas
 superficialmente.
 
 a) ¿Qué mecanismos usan para comunicarse con el kernel?
 
+---
+
+**Res:**
+El mecanismo que utilizan para comunicarse es mediante `syscalls` y colocando valores en al memoria compartida para que puedan ser leídos mediante otras tareas y/o el kernel
+
+---
+
 b) ¿Por qué creen que no hay uso de variables globales? ¿Qué pasaría si
     una tarea intentase escribir en su `.data` con nuestro sistema?
+
+---
+
+**Res:**
+
+La razón es que cualquier tarea podría acceder a este valor y sobreescribirlo. Si la tarea intenta acceder a su `.data`, esta no podría por las políticas de protección de memoria del kernel.
+
+---
 
 c) Cambien el divisor del PIT para \"acelerar\" la ejecución de las tareas:
 ```
@@ -303,6 +409,14 @@ se ubica al principio de las tareas.
 
 a. ¿Por qué la tarea termina en un loop infinito?
 
+---
+
+**Res:**
+
+Termina en loop infinito porque no existe lógica de terminación de una tarea.
+
+---
+
 b. \[Opcional\] ¿Qué podríamos hacer para que esto no sea necesario?
 
 ### Cuarta parte: Hacer nuestra propia tarea
@@ -318,9 +432,26 @@ taller anterior.
 de tareas? ¿Como harían para ejecutar una tarea distinta? Cambien la
 tarea S*nake* por una tarea *PongScoreboard*.
 
+---
+
+**Res:**
+
+Se definen 2 tipos de tareas porque queremos que nuestro programa ejecute nada más estas 2 tareas en simultáneo.
+
+---
+
 **19.** Mirando la tarea *Pong*, ¿En que posición de memoria escribe
 esta tarea el puntaje que queremos imprimir? ¿Cómo funciona el mecanismo
 propuesto para compartir datos entre tareas?
+
+---
+
+**Res:**
+
+Escribe en la posición PAGE_ON_DEMAND_BASE_VADDR + 0xF00 que se encuentra en la página ON_DEMAND.
+El mecanismo funciona tal que al estar este puntaje en la página ON_DEMAND caulquier tarea puede acceder a esa posición de memoria.
+
+---
 
 #### Programando:
 

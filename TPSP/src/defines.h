@@ -41,10 +41,10 @@ TALLER System Programming - Arquitectura y Organizacion de Computadoras - FCEN
  * Definirlos a partir de los índices de la GDT, definidos más arriba 
  * Hint: usar operadores "<<" y "|" (shift y or) */
 
-#define GDT_CODE_0_SEL ??
-#define GDT_DATA_0_SEL ??
-#define GDT_CODE_3_SEL ??
-#define GDT_DATA_3_SEL ??
+#define GDT_CODE_0_SEL ((GDT_IDX_CODE_0 << 3) | 0)
+#define GDT_DATA_0_SEL ((GDT_IDX_DATA_0 << 3) | 0)
+#define GDT_CODE_3_SEL ((GDT_IDX_CODE_3 << 3) | 3)
+#define GDT_DATA_3_SEL ((GDT_IDX_DATA_3 << 3) | 3)
 
 
 // Macros para trabajar con segmentos de la GDT.
@@ -64,14 +64,14 @@ TALLER System Programming - Arquitectura y Organizacion de Computadoras - FCEN
 
 /* COMPLETAR - (Parte 1: Pasaje a modo protegido)  - Valores de atributos */ 
 /* -------------------------------------------------------------------------- */
-//#define DESC_CODE_DATA ??
-//#define DESC_SYSTEM    ??
-//#define DESC_TYPE_EXECUTE_READ ??
-//#define DESC_TYPE_READ_WRITE   ??
+#define DESC_CODE_DATA            1
+#define DESC_SYSTEM               0
+#define DESC_TYPE_EXECUTE_READ    0xA   //1010
+#define DESC_TYPE_READ_WRITE      0x2   //0010
 
 /* COMPLETAR - Tamaños de segmentos */ 
-//#define FLAT_SEGM_SIZE   ??
-//#define VIDEO_SEGM_SIZE  ??
+#define FLAT_SEGM_SIZE            GDT_LIMIT_4KIB(1024 * 1024 * 817)   
+#define VIDEO_SEGM_SIZE           GDT_LIMIT_BYTES(80 * 50 * 2) //Cada celda son 2 bytes y hay un total de 80 * 50 celdas
 
 
 /* Direcciones de memoria */
@@ -96,13 +96,15 @@ VIRT_PAGE_DIR(X)    devuelve el page directory entry, donde X es una dirección 
 CR3_TO_PAGE_DIR(X)  devuelve el page directory, donde X es el contenido del registro CR3
 MMU_ENTRY_PADDR(X)  devuelve la dirección física de la base de un page frame o de un page table, donde X es el campo de 20 bits en una PTE o PDE
 
-#define VIRT_PAGE_OFFSET(X) ??
-#define VIRT_PAGE_TABLE(X)  ??
-#define VIRT_PAGE_DIR(X)    ??
-#define CR3_TO_PAGE_DIR(X)  ??
-#define MMU_ENTRY_PADDR(X)  ??
-
 */
+
+#define VIRT_PAGE_OFFSET(X) (X & 0xFFF)
+#define VIRT_PAGE_TABLE(X)  ((X >> 12) & 0x3FF)
+#define VIRT_PAGE_DIR(X)    ((X >> 22) & 0x3FF)
+#define CR3_TO_PAGE_DIR(X)  (X & 0xFFFFF000)
+#define MMU_ENTRY_PADDR(X)  (X << 12)
+
+
 
 #define MMU_P (1 << 0)
 #define MMU_W (1 << 1)
