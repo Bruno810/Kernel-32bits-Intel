@@ -149,6 +149,6 @@ qemu: clean image
 	
 
 attach:
-	gdb $(KERNEL_BIN).elf -ex "source orga2.py" -ex "target remote localhost:1234" -ex "set disassembly-flavor intel"
+	gdb $(KERNEL_BIN).elf -ex "source orga2.py" -ex "target remote localhost:1234" -ex "set disassembly-flavor intel" -ex "continue"
 
 gdb: qemu attach
