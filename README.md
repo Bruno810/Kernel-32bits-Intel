@@ -45,8 +45,8 @@ make attach   # attach GDB (in a separate terminal)
 
 ## Reference
 
-- [Intel SDM Vol. 3 – System Programming Guide](https://software.intel.com/content/dam/develop/external/us/en/documents-tps/325384-sdm-vol-3abcd.pdf)
 - [Intel SDM Vol. 1 – Basic Architecture](https://software.intel.com/content/dam/develop/external/us/en/documents-tps/253665-sdm-vol-1.pdf)
 - [Intel SDM Vol. 2 – Instruction Set Reference](https://software.intel.com/content/dam/develop/external/us/en/documents-tps/325383-sdm-vol-2abcd.pdf)
+- [Intel SDM Vol. 3 – System Programming Guide](https://software.intel.com/content/dam/develop/external/us/en/documents-tps/325384-sdm-vol-3abcd.pdf)
 
 > Per-stage documentation (Protected Mode, Interrupts, Paging, Tasks) is available in the `TPSP/` directory in Spanish.
