@@ -36,10 +36,7 @@ TALLER System Programming - Arquitectura y Organizacion de Computadoras - FCEN
 #define GDT_OFF_NULL_DESC (GDT_IDX_NULL_DESC << 3)
 #define GDT_OFF_VIDEO  (GDT_IDX_VIDEO << 3)
 
-/* COMPLETAR - (Parte 1: Pasaje a modo protegido) 
- * Valores para los selectores de segmento de la GDT 
- * Definirlos a partir de los índices de la GDT, definidos más arriba 
- * Hint: usar operadores "<<" y "|" (shift y or) */
+/* Valores para los selectores de segmento de la GDT  */
 
 #define GDT_CODE_0_SEL ((GDT_IDX_CODE_0 << 3) | 0)
 #define GDT_DATA_0_SEL ((GDT_IDX_DATA_0 << 3) | 0)
@@ -62,14 +59,14 @@ TALLER System Programming - Arquitectura y Organizacion de Computadoras - FCEN
 #define GDT_BASE_HIGH(base) (uint8_t)((((uint32_t)(base)) >> 24) & 0xFF)
 
 
-/* COMPLETAR - (Parte 1: Pasaje a modo protegido)  - Valores de atributos */ 
+/* Valores de atributos */ 
 /* -------------------------------------------------------------------------- */
 #define DESC_CODE_DATA            1
 #define DESC_SYSTEM               0
 #define DESC_TYPE_EXECUTE_READ    0xA   //1010
 #define DESC_TYPE_READ_WRITE      0x2   //0010
 
-/* COMPLETAR - Tamaños de segmentos */ 
+/* Tamaños de segmentos */ 
 #define FLAT_SEGM_SIZE            GDT_LIMIT_4KIB(1024 * 1024 * 817)   
 #define VIDEO_SEGM_SIZE           GDT_LIMIT_BYTES(80 * 50 * 2) //Cada celda son 2 bytes y hay un total de 80 * 50 celdas
 
@@ -77,7 +74,7 @@ TALLER System Programming - Arquitectura y Organizacion de Computadoras - FCEN
 /* Direcciones de memoria */
 /* -------------------------------------------------------------------------- */
 
-// direccion fisica de comienzo del bootsector (copiado)
+// direccion fisica de comienzo del bootsector
 #define BOOTSECTOR 0x00001000
 // direccion fisica de comienzo del kernel
 #define KERNEL 0x00001200
@@ -87,15 +84,14 @@ TALLER System Programming - Arquitectura y Organizacion de Computadoras - FCEN
 #define SHARED 0x0001D000
 
 
-/* COMPLETAR - (Parte 3: Paginación) - defines para MMU */
+/* Defines para MMU */
 /* -------------------------------------------------------------------------- */
-/* Definan:
+/*
 VIRT_PAGE_OFFSET(X) devuelve el offset dentro de la página, donde X es una dirección virtual
 VIRT_PAGE_TABLE(X)  devuelve la page table entry correspondiente, donde X es una dirección virtual
 VIRT_PAGE_DIR(X)    devuelve el page directory entry, donde X es una dirección virtual
 CR3_TO_PAGE_DIR(X)  devuelve el page directory, donde X es el contenido del registro CR3
 MMU_ENTRY_PADDR(X)  devuelve la dirección física de la base de un page frame o de un page table, donde X es el campo de 20 bits en una PTE o PDE
-
 */
 
 #define VIRT_PAGE_OFFSET(X) (X & 0xFFF)

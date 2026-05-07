@@ -35,7 +35,7 @@ typedef struct {
 static sched_entry_t sched_tasks[MAX_TASKS] = {0};
 
 /**
- * Tarea actualmente en ejecución (excepto que esté pasuada, en cuyo caso se
+ * Tarea actualmente en ejecución (excepto que esté pausada, en cuyo caso se
  * corre la idle).
  */
 int8_t current_task = 0;

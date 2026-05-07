@@ -78,10 +78,6 @@ extern process_scancode
     cmp edx, CS_RING_0_SEL
     je .ring0_exception
 
-    ; COMPLETAR (opcional) (Parte 4: Tareas):
-    ;   Si caemos acá es porque una tarea causó una excepción
-    ;   En lugar de frenar el sistema podríamos matar la tarea (o reiniciarla)
-    ;   ¿Cómo harían eso?
     call kernel_exception
     add esp, 10*4
     popad
@@ -133,7 +129,7 @@ ISRE 10
 ISRE 11
 ISRE 12
 ISRE 13
-;ISRE 14 ; comentar esta línea en la parte 3 (paginación)
+;ISRE 14
 ISRNE 15
 ISRNE 16
 ISRE 17
@@ -141,14 +137,14 @@ ISRNE 18
 ISRNE 19
 ISRNE 20
 
-;; Rutina de atención de Page Fault ISRE 14 ; Descomentar esta rutina en la parte 3 (paginación)
+;; Rutina de atención de Page Fault ISRE 14
 ;; -------------------------------------------------------------------------- ;;
 global _isr14
 
 _isr14:
 	; Estamos en un page fault.
 	pushad
-    ; llamar rutina de atención de page fault, pasandole la dirección que se intentó acceder
+  
   .ring0_exception:
 
   mov edi, cr2
@@ -171,7 +167,6 @@ _isr14:
 ;; Rutina de atención del RELOJ
 ;; -------------------------------------------------------------------------- ;;
 global _isr32
-; COMPLETAR (Parte 2: Interrupciones): La rutina se encuentra escrita parcialmente. Completar la rutina
 _isr32:
     pushad
     ; 1. Le decimos al PIC que vamos a atender la interrupción
@@ -201,7 +196,6 @@ _isr32:
 ;; Rutina de atención del TECLADO
 ;; -------------------------------------------------------------------------- ;;
 global _isr33
-; COMPLETAR: Implementar la rutina
 _isr33:
     pushad
     ; 1. Le decimos al PIC que vamos a atender la interrupción
@@ -221,9 +215,6 @@ _isr33:
 ;; -------------------------------------------------------------------------- ;;
 
 global _isr88
-; COMPLETAR: Implementar la rutina
-; Para la seccion de interrupciones: que modifique el valor de eax por 0x58
-; Para las secciones de paginación y tareas: que llame a la funcion task_syscall_draw
 _isr88:
 
     pushad
@@ -235,9 +226,6 @@ _isr88:
     popad
     iret
 
-
-; COMPLETAR: Implementar la rutina
-; La rutina debe modificar el valor de eax por 0x62
 global _isr98
 _isr98:
   

@@ -121,7 +121,6 @@ static const struct scancode_info scancode_defs[256] = {
 
 	[0x3a] = { '\0', TOGGLE_SHIFT_IDX }, // CapsLock
 
-	// IDEA: ¿Como usarian los Fx para poder cambiar de color?
 	[0x3b] = { '\0', '\0' }, // F1
 	[0x3c] = { '\0', '\0' }, // F2
 	[0x3d] = { '\0', '\0' }, // F3

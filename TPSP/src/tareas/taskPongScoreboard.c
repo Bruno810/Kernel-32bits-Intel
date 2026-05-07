@@ -9,11 +9,7 @@
 
 void task(void) {
     screen pantalla;
-    // ¿Una tarea debe terminar en nuestro sistema?
     while (true){
-    // Completar:
-    // - Pueden definir funciones auxiliares para imprimir en pantalla
-    // - Pueden usar `task_print`, `task_print_dec`, etc.
         task_print(pantalla, "Task 1", WIDTH / 2 - 3, 4, C_FG_WHITE);
         task_print(pantalla, "Task 2", WIDTH / 2 - 3, 7, C_FG_WHITE);
         task_print(pantalla, "Task 3", WIDTH / 2 - 3, 10, C_FG_WHITE);

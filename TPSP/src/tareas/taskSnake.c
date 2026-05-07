@@ -5,7 +5,7 @@
 #define HEIGHT TASK_VIEWPORT_HEIGHT
 
 /**
- * Celda deuna partida de snake, tiene el siguiente formato:
+ * Celda de una partida de snake, tiene el siguiente formato:
  *
  *     01234567
  *     ^   ^ ^-- Dirección (UP=0, DOWN=2, LEFT=2, RIGHT=3)

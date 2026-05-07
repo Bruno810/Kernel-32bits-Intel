@@ -176,7 +176,7 @@ paddr_t mmu_unmap_page(uint32_t cr3, vaddr_t virt) {
  * @param src_addr la dirección de la página cuyo contenido queremos copiar
  *
  * Esta función mapea ambas páginas a las direcciones SRC_VIRT_PAGE y DST_VIRT_PAGE, respectivamente, realiza
- * la copia y luego desmapea las páginas. Usar la función rcr3 definida en i386.h para obtener el cr3 actual
+ * la copia y luego desmapea las páginas.
  */
 void copy_page(paddr_t dst_addr, paddr_t src_addr) {
 
@@ -235,7 +235,7 @@ paddr_t mmu_init_task_dir(paddr_t phy_start) {
   return nuevo_cr3;
 }
 
-// COMPLETAR: devuelve true si se atendió el page fault y puede continuar la ejecución 
+// Devuelve true si se atendió el page fault y puede continuar la ejecución 
 // y false si no se pudo atender
 bool page_fault_handler(vaddr_t virt) {
   print("Atendiendo page fault...", 0, 0, C_FG_WHITE | C_BG_BLACK);

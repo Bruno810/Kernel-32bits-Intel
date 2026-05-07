@@ -19,10 +19,7 @@ typedef struct str_gdt_descriptor {
   uint32_t gdt_addr;
 } __attribute__((__packed__)) gdt_descriptor_t;
 
-// Entrada de la GDT. Es una estructura
-// Los campos con dos puntos (:) por ejemplo, uint8_t s : 1; significa que usa solo un bit de los 8 definidos en el tipo uint8_t
-// Asi tambien uint8_t type : 4; significa que usa 4 bits menos significativos del tipo.
-// De esta manera, se pueden definir campos que no sean múltiplos del tamaño de un byte
+// Entrada de la GDT.
 typedef struct str_gdt_entry {
   uint16_t limit_15_0;
   uint16_t base_15_0;

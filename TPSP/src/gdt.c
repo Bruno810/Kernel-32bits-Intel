@@ -34,13 +34,6 @@ gdt_entry_t gdt[GDT_COUNT] = {
             .base_31_24 = 0x00,
         },
 
-    /* Completar la GDT: 
-      Es conveniente completar antes las constantes definidas en defines.h y valerse
-      de las mismas para definir los descriptores acá. Traten en lo posible de usar las 
-      macros allí definidas.
-      Tomen el descriptor nulo como ejemplo y definan el resto.
-     */
-
     [GDT_IDX_CODE_0] =
         {
             .limit_15_0 = GDT_LIMIT_LOW(FLAT_SEGM_SIZE),
@@ -133,5 +126,5 @@ gdt_entry_t gdt[GDT_COUNT] = {
 };
 
 // Aca hay una inicializacion estatica de una structura que tiene su primer componente el tamano 
-// y en la segunda, la direccion de memoria de la GDT. Observen la notacion que usa. 
+// y en la segunda, la direccion de memoria de la GDT.
 gdt_descriptor_t GDT_DESC = {sizeof(gdt) - 1, (uint32_t)&gdt};

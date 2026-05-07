@@ -22,21 +22,9 @@ idt_descriptor_t IDT_DESC = {sizeof(idt) - 1, (uint32_t)&idt};
  * solo incluye sus 16bits mas significativos */
 #define HIGH_16_BITS(v) ((uint32_t)(v) >> 16 & 0xFFFF)
 
-/*
-    La siguiente es una macro de EJEMPLO para ayudar a armar entradas de
-    interrupciones. Para usar, completar CORRECTAMENTE los atributos
-    (en defines.h) y el registro de segmento (ver defines.h). Invocarla
-    desde idt_init() de la siguiene manera:
 
-    void idt_init() {
-        IDT_ENTRY0(0);
-        ...
-        IDT_ENTRY0(19);
-        ...
-    }
-*/
 
-/* DESCOMENTAR Y COMPLETAR: Dado un numero de de interrupcion asigna a `idt` la entrada
+/* Dado un numero de de interrupcion asigna a `idt` la entrada
  * correspondiente con nivel 0 */
 
 #define IDT_ENTRY0(numero)                                                     \
@@ -50,7 +38,7 @@ idt_descriptor_t IDT_DESC = {sizeof(idt) - 1, (uint32_t)&idt};
   }
 
 
-/* DESCOMENTAR Y COMPLETAR: Dado un numero de de interrupcion asigna a `idt` la entrada
+/* Dado un numero de de interrupcion asigna a `idt` la entrada
  * correspondiente con nivel 3 */
 
 #define IDT_ENTRY3(numero)                                                     \
@@ -64,7 +52,6 @@ idt_descriptor_t IDT_DESC = {sizeof(idt) - 1, (uint32_t)&idt};
   }
 
 
-// DESCOMENTAR Y COMPLETAR
 
 void idt_init() {
   // Excepciones
@@ -90,11 +77,11 @@ void idt_init() {
   IDT_ENTRY0(19);
   IDT_ENTRY0(20);
 
-  // COMPLETAR: Interrupciones de reloj y teclado
+  //Interrupciones de reloj y teclado
   IDT_ENTRY0(32);
   IDT_ENTRY0(33);
 
-  // COMPLETAR: Syscalls
+  //Syscalls
   IDT_ENTRY3(88);
   IDT_ENTRY3(98);
 }

@@ -87,10 +87,8 @@ struct environment {
  * no puede asumir "hay dos reads seguidos sin ningun write en el medio
  * entonces ambos reads siempre dan lo mismo".
  *
- * ¡Eso es exactamente lo que queremos!
- *
  * Si en el medio de esos dos reads ocurre una interrupción nos interesa
- * poder ver que dan distinto :)
+ * poder ver que dan distinto
  *
  * Por ejemplo, imaginemonos que queremos esperar a que el clock cambie,
  * haciendo que el entorno sea `volatile` podemos escribir esto:
@@ -99,7 +97,7 @@ struct environment {
  * uint32_t clock_now = ENVIRONMENT->tick_count;
  * // No hacemos nada mientras sea exactamente igual
  * while (clock_now == ENVIRONMENT->tick_count);
- * // Ahora cambió el reloj! Eso significa que "avanzamos en el tiempo"
+ * // Ahora cambió el reloj.
  * ```
  */
 #define ENVIRONMENT ((volatile CONSTNESS struct environment*)(SHARED_MEM_PTR))

@@ -11,7 +11,6 @@
 
 #include "types.h"
 
-// COMPLETAR: Definir INTERRUPT_GATE_TYPE con el valor correspondiente
 #define INTERRUPT_GATE_TYPE 0xE   //1110
 
 /* Struct de descriptor de IDT */

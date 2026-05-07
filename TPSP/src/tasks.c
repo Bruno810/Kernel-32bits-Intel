@@ -84,7 +84,7 @@ void tasks_syscall_draw(ca viewport[TASK_VIEWPORT_HEIGHT][TASK_VIEWPORT_WIDTH]) 
   // Si el viewport empieza antes de la memoria de la tarea ignoramos la syscall
   if (viewport_addr < TASK_CODE_VIRTUAL) return;
   // Si el viewport termina después de la memoria de la tarea ignoramos la syscall
-  // NOTA: `sizeof(*viewport)` nos da el tamaño del array :)
+  // NOTA: `sizeof(*viewport)` nos da el tamaño del array
   if (TASK_SHARED_PAGE <= viewport_addr + sizeof(*viewport)) return;
   int8_t task_id = current_task;
   kassert(task_id <= 3, "task_id fuera del rango valido!");
